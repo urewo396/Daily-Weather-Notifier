@@ -18,7 +18,7 @@ This simple C# console app fetches the daily weather forecast at **00:00** every
 ## 🔔 Future Ideas 
 
 - [x] 📡 City based on your location (you wont need to change 'city' it will do it automatically)
-- [ ] 💬 Add telegram bot that can announce weather notifications
+- [x] 💬 Add telegram bot that can announce weather notifications
 - [ ] 💬 Add voice alerts (say the weather aloud using a TTS lib)
 - [ ] 📲 Make a phone app so it can send notifications every day to your phone
 - [x] ✅ Add error handling to make the program more stable
