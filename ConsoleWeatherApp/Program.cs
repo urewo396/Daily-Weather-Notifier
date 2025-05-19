@@ -1,18 +1,14 @@
 ﻿using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using PushSharp.Apple;
-using PushSharp.Core;
-using System.Net.Http.Headers;
-using System.Xml.Xsl;
-
+using System.Text.Json;
 
 
 class Program
 {
 
+
     static async Task Main(string[] args)
     {
-
+        await RunWeatherCheck();
 
         while (true)
         {
@@ -35,7 +31,7 @@ class Program
     static async Task RunWeatherCheck()
     {
         string apiKey = "YOUR_API_KEY";
-        string city = "YOUR_CITY";
+        string city = await GetLocation();
         string url = $"https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/" + city + "?key=" + apiKey + "&lang=en&unitGroup=metric";
 
         HttpClient client = new HttpClient();
@@ -47,6 +43,7 @@ class Program
 
         dynamic weather = JsonConvert.DeserializeObject(body);
 
+        // Get weather TMAX, TMIN, and description
         string weatherDate = weather.days[0].datetime;
         string weather_desc = weather.days[0].description;
         string weatherMax = weather.days[0].tempmax;
@@ -57,6 +54,7 @@ class Program
         Console.WriteLine("Forecast for today: ");
         Console.WriteLine("Max Temperature is going to be: " + weatherTmax + "°C");
         Console.WriteLine("Min Temperature is going to be: " + weatherTmin + "°C");
+        Console.WriteLine("Weather overall description: " + weather_desc + "\n");
 
         if (weatherTmax < 12 && weatherTmax > 5)
         {
@@ -70,5 +68,32 @@ class Program
         {
             Console.WriteLine("Consider wearing a coat, it is going to be very cold today. Don't forget to wear gloves and a hat!");
         }
-    } 
+    }
+
+    static async Task<string> GetLocation()
+    {
+        // Get public IP address using ipinfo.io
+        HttpClient client = new HttpClient();
+        string url = "https://ipinfo.io/json";
+        HttpResponseMessage response = await client.GetAsync(url);
+        response.EnsureSuccessStatusCode();
+        var body = await response.Content.ReadAsStringAsync();
+
+        using JsonDocument doc = JsonDocument.Parse(body);
+        JsonElement root = doc.RootElement;
+        var ip = root.GetProperty("ip").GetString();
+
+        //determine location on IPSTACK API, because ipinfo sometimes misplaces the location
+        string locationAccessKey = "YOUR_ACCESS_KEY_FROM_IPSTACK";
+        string locationUrl = "http://api.ipstack.com/" + ip + "?access_key=" + locationAccessKey;
+        HttpClient locationClient = new HttpClient();
+        HttpResponseMessage locationResponse = await locationClient.GetAsync(locationUrl);
+        locationResponse.EnsureSuccessStatusCode();
+        var locationBody = await locationResponse.Content.ReadAsStringAsync();
+        using JsonDocument locationDoc = JsonDocument.Parse(locationBody);
+        JsonElement locationRoot = locationDoc.RootElement;
+        var city = locationRoot.GetProperty("city").GetString();
+
+        return city;
+    }
 }
