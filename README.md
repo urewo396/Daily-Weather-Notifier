@@ -12,18 +12,28 @@ This simple C# console app fetches the daily weather forecast at **00:00** every
 
 ## ✅ What to do before running
 
--  🔑 Grab your **API key** from Visual Crossing
--  🌍 Change the `city` variable in the code to your location
-
+-  🔑 Grab your **API key** from Visual Crossing and IPStack
 ---
 
 ## 🔔 Future Ideas 
 
+- [x] 📡 City based on your location (you wont need to change 'city' it will do it automatically)
+- [ ] 💬 Add telegram bot that can announce weather notifications
 - [ ] 💬 Add voice alerts (say the weather aloud using a TTS lib)
 - [ ] 📲 Make a phone app so it can send notifications every day to your phone
-- [ ] ✅ Add error handling to make the program more stable
-- [x] 📡 City based on your location (you wont need to change 'city' it will do it automatically)
+- [x] ✅ Add error handling to make the program more stable
 
+## Structure
+```
+ConsoleWeatherApp/
+│
+├── ConsoleWeatherApp.csproj # Project file
+├── Program.cs # Entry point
+│
+├── Services/ # 💡 Logic and helpers
+│ └── WeatherService.cs # Handles weather fetching and output
+| └── LocationService.cs # Handles location services
+```
 ---
 
 Made by Max ;)
