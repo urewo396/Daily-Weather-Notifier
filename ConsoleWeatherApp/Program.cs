@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using System.Text.Json;
 using ConsoleWeatherApp.Services;
+using DotNetEnv;
 
 class Program
 {
@@ -8,6 +9,7 @@ class Program
 
     static async Task Main(string[] args)
     {
+        Env.Load();
 
         while (true)
         {

@@ -14,7 +14,7 @@ namespace ConsoleWeatherApp.Services
             
             if (!response.IsSuccessStatusCode)
             {
-                Console.WriteLine("⚠️ API call wasnt successfull");
+                Console.WriteLine("⚠️ IPINFO API call wasnt successfull");
                 return "ERROR WITH IPINFO API";
             }
 
@@ -25,14 +25,14 @@ namespace ConsoleWeatherApp.Services
             var ip = root.GetProperty("ip").GetString();
 
             //determine location on IPSTACK API, because ipinfo sometimes misplaces the location
-            string locationAccessKey = "YOUR_ACCESS_KEY_FROM_IPSTACK";
-            string locationUrl = "http://api.ipstack.com/" + ip + "?access_key=" + locationAccessKey;
+            string locationAPIKey = Environment.GetEnvironmentVariable("IPSTACK_API_KEY");
+            string locationUrl = "http://api.ipstack.com/" + ip + "?access_key=" + locationAPIKey;
 
             HttpResponseMessage locationResponse = await HttpClientProvider.Client.GetAsync(locationUrl);
             
             if (!locationResponse.IsSuccessStatusCode)
             {
-                Console.WriteLine("⚠️ API call wasnt successfull");
+                Console.WriteLine("⚠️ IPSTACK API call wasnt successfull");
                 return "ERROR WITH IPSTACK API";
             }
 
@@ -40,9 +40,17 @@ namespace ConsoleWeatherApp.Services
 
             using JsonDocument locationDoc = JsonDocument.Parse(locationBody);
             JsonElement locationRoot = locationDoc.RootElement;
-            var city = locationRoot.GetProperty("city").GetString();
 
-            return city;
+            if (locationRoot.TryGetProperty("city", out JsonElement cityElement))
+            {
+                var city = cityElement.GetString();
+                return city;
+            }
+            else
+            {
+                Console.WriteLine("❌ 'city' not found in IPStack API response.");
+                return "ERROR: CITY NOT FOUND";
+            }
         }
     }
 }
